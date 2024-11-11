@@ -17,7 +17,7 @@ public class GameUI {
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
         // Display image
-        BufferedImage picture = ImageIO.read(new File("resources/Paper.png"));
+        BufferedImage picture = ImageIO.read(new File("resources/paper.png"));
         JLabel picLabel = new JLabel(new ImageIcon(picture.getScaledInstance(300, 300, Image.SCALE_FAST)));
         frame.add(picLabel);
 
