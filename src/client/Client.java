@@ -1,32 +1,43 @@
-import java.io*;
-import java.net*;
+import java.io.*;
+import java.net.*;
 
 public class Client {
     public static void main(String[] args){
-        try{
-            //connect to server
-            Socket socket = new Socket("localhost", 273);
-
-            //open input/output streams
-            BufferedReader in = newBufferedReader(new InputStreamReader(clientSocket.getInputStream()));
-            //not sure about output stream since we're not printing messages?
-            //have to look into that
-
-            //recieve server's choice of rock [r], paper [p], scissors [s]
-            String oppChoice = in.readLine();
-
-            //compare choices
-
-            //send message for server's result
-
-            //display client's result
-
-            //close connections
-            in.close();
-            //out.close();
-            socket.close();
-        } catch (IOException e){
-            e.printStackTrace();
+        try {
+        	//establish a connection 
+        	Socket socket = new Socket("localhost", 37);
+        	//reads input from terminal
+        	BufferedReader input = new BufferedReader(new InputStreamReader(System.in));
+        	//sends output to the socket
+        	DataOutputStream toSocket = new DataOutputStream(socket.getOutputStream());
+        	
+        	int playAgain=0;
+        	int clientPlay;
+        	
+        	while(playAgain!=1) {
+        		System.out.println("Rock [1], Paper [2], Scissors [3]");
+        		//client chooses rock/paper/scissors
+        		clientPlay = Integer.parseInt(input.readLine());
+        		//sends choice to server
+        		toSocket.write(clientPlay);
+        		
+        		System.out.println("Play again? [0] yes, [1] no");
+        		//client chooses to play again
+        		playAgain = Integer.parseInt(input.readLine());
+        		//sends choice to server
+        		toSocket.write(playAgain);
+        	}
+        	
+        	//close connection and streams
+        	socket.close();
+        	input.close();
+        	toSocket.close();
+        }
+        catch (UnknownHostException e) {
+        	e.printStackTrace();
+        }
+        catch (IOException e) {
+        	e.printStackTrace();
         }
     }
 }
