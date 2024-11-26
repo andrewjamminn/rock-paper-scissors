@@ -1,5 +1,6 @@
 import java.io.*;
 import java.net.*;
+import java.util.concurrent.TimeUnit;
 
 public class Server {
 
@@ -17,18 +18,35 @@ public class Server {
             System.out.println("Connection established");
             //taking input from client socket
             DataInputStream in = new DataInputStream(new BufferedInputStream(socket.getInputStream()));
+			// Sends output to the socket
+			DataOutputStream out = new DataOutputStream(socket.getOutputStream());
             
-            
+
+
+			System.out.println("Client Played: " + in.readUTF());
+			try {
+				TimeUnit.SECONDS.sleep(1);
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
+			// Args: gameResult, roundWinner, clientScore, serverScore
+			out.writeUTF(String.format("%s,%s,%d,%d", "paper-paper", "Client", 4, 2));
+			out.flush();
+
+
+    /*        
             //initial input value 0 to start game from scratch
             int clientPlay;
             int playAgain = 0;
-            //System.out.println(in.read());
-            /*
-            INPUTS:
-            [1] -> rock
-            [2] -> paper
-            [3] -> scissors
-             */
+
+			// Get client selection with in.readUTF();
+            
+            
+            // INPUTS:
+            // [1] -> rock
+            // [2] -> paper
+            // [3] -> scissors
+            
             while(playAgain!=1) {
             	try {
             	//read client play selection
@@ -84,7 +102,7 @@ public class Server {
             		e.printStackTrace();
             	}
             }
-            
+	*/		        
             //close server and data streams
             server.close();
             in.close();
