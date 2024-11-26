@@ -25,7 +25,7 @@ public class Server {
 
 			System.out.println("Client Played: " + in.readUTF());
 			try {
-				TimeUnit.SECONDS.sleep(1);
+				TimeUnit.MILLISECONDS.sleep(500);
 			} catch (InterruptedException e) {
 				e.printStackTrace();
 			}
@@ -102,8 +102,9 @@ public class Server {
             		e.printStackTrace();
             	}
             }
-	*/		        
-            //close server and data streams
+	*/		
+
+            // close server and data streams
             server.close();
             in.close();
         }

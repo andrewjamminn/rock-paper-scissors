@@ -12,14 +12,15 @@ public class GameUI {
     private static JButton rock, paper, scissors;
     private static JPanel iconPanel;
     private static JPanel mainPanel;
+    private static JFrame frame;
 
     private static CardLayout cardLayout;
     private static Client gameClient;
 
     static void createGUI(Client client) {
         // Set up and create the JFrame window
-        JFrame frame = new JFrame("Rock Paper Scissors");
-        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        frame = new JFrame("Rock Paper Scissors");
+        frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 
         // Create main panel with CardLayout
         cardLayout = new CardLayout();
@@ -46,13 +47,13 @@ public class GameUI {
         JPanel panel = new JPanel(new GridBagLayout());
         panel.setBackground(new Color(174, 214, 241));
 
-        // Create container for vertically aligning elements
-        GridBagConstraints constraints = new GridBagConstraints();
-        constraints.gridx = 0;
-        constraints.gridy = 0;
-        constraints.insets = new Insets(0, 0, 20, 0);
+        // Set up GridBagConstraints for centering the components
+        GridBagConstraints gbc = new GridBagConstraints();
+        gbc.gridx = 0;
+        gbc.gridy = 0;
+        gbc.insets = new Insets(0, 0, 20, 0);
 
-        // Create icon panel with null layout for sliding animations
+        // Create icon panel with null layout
         iconPanel = new JPanel(null);
         iconPanel.setOpaque(false);
         iconPanel.setPreferredSize(new Dimension(640, 200));
@@ -73,7 +74,7 @@ public class GameUI {
         iconPanel.add(scissors);
 
         // Add icon panel to the panel with GridBagConstraints
-        panel.add(iconPanel, constraints);
+        panel.add(iconPanel, gbc);
 
         // Create instruction label
         JLabel label = new JLabel("Click your object to play");
@@ -82,9 +83,9 @@ public class GameUI {
         label.setBorder(BorderFactory.createEmptyBorder(20, 0, 0, 0));
 
         // Update GridBagConstraints to place the label below the icon panel
-        constraints.gridy = 1;
-        constraints.insets = new Insets(0, 0, 0, 0);
-        panel.add(label, constraints);
+        gbc.gridy = 1;
+        gbc.insets = new Insets(0, 0, 0, 0);
+        panel.add(label, gbc);
 
         return panel;
     }
@@ -134,7 +135,7 @@ public class GameUI {
     }
     
     private static JPanel scorePage(String clientScore, String serverScore) {
-        // Create the panel with GridBagLayout
+        // Create the panel
         JPanel panel = new JPanel(new GridBagLayout());
         panel.setBackground(new Color(244, 208, 63));
 
@@ -149,23 +150,38 @@ public class GameUI {
         JLabel scoreLabel = new JLabel("Current score is " + clientScore + " to " + serverScore);
         scoreLabel.setFont(new Font("Arial", Font.BOLD, 24));
         panel.add(scoreLabel, gbc);
-
-        // Move down for the next component
         gbc.gridy++;
 
         // Create and add the "Would you like to play again?" text
         JLabel playAgainTextLabel = new JLabel("Would you like to play again?");
         playAgainTextLabel.setFont(new Font("Arial", Font.PLAIN, 18));
         panel.add(playAgainTextLabel, gbc);
-
-        // Move down for the next component
         gbc.gridy++;
 
+        // Create a new panel for the buttons with FlowLayout
+        JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 20, 0));
+        buttonPanel.setOpaque(false);
+
         // Create and add the "Play Again" button
-        JButton playAgainButton = new JButton("Play Again");
+        JButton playAgainButton = new JButton("Yes");
         playAgainButton.setFont(new Font("Arial", Font.PLAIN, 18));
         playAgainButton.addActionListener(e -> cardLayout.show(mainPanel, PAGE_SELECTION));
-        panel.add(playAgainButton, gbc);
+        buttonPanel.add(playAgainButton);
+
+        // Create and add the "Quit Game" button
+        JButton quitGameButton = new JButton("No");
+        quitGameButton.setFont(new Font("Arial", Font.PLAIN, 18));
+        quitGameButton.addActionListener(e -> {
+            try {
+                gameClient.close();
+                frame.dispose();
+            } catch (IOException e1) {
+                e1.printStackTrace();
+            }
+        });
+        buttonPanel.add(quitGameButton);
+
+        panel.add(buttonPanel, gbc);
 
         return panel;
     }
