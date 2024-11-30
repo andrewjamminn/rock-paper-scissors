@@ -73,18 +73,9 @@ public class Server {
                             userChoice + "-" + serverChoice, roundWinner, clientScore, serverScore, ties));
                         out.flush();
 
-                        String playAgain = in.readUTF();
-                        if (playAgain.equalsIgnoreCase("no")) {
-                            keepPlaying = false;
-                            System.out.println("Client chose to quit. Ending game...");
-                        } else if (!playAgain.equalsIgnoreCase("yes")) {
-                            System.out.println("Invalid replay signal received: " + playAgain);
-                            break;
-                        }
                     } catch (IOException e) {
                         System.out.println("Connection lost or error occurred. Ending game.");
-                        e.printStackTrace();
-                        break;
+                        keepPlaying = false;
                     }
                 }
             }
