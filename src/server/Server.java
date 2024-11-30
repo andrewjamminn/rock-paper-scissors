@@ -1,5 +1,6 @@
 import java.io.*;
 import java.net.*;
+import java.util.concurrent.TimeUnit;
 
 public class Server {
 
@@ -69,11 +70,13 @@ public class Server {
                             ties++;
                         }
 
-                        out.writeUTF(String.format("%s,%s,%d,%d,%d", 
-                            userChoice + "-" + serverChoice, roundWinner, clientScore, serverScore, ties));
+                        TimeUnit.MILLISECONDS.sleep(500);
+
+                        out.writeUTF(String.format("%s,%s,%s,%d,%d,%d", 
+                            userChoice + "-" + serverChoice, serverChoice, roundWinner, clientScore, serverScore, ties));
                         out.flush();
 
-                    } catch (IOException e) {
+                    } catch (IOException | InterruptedException e) {
                         System.out.println("Connection lost or error occurred. Ending game.");
                         keepPlaying = false;
                     }

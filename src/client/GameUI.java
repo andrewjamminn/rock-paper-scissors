@@ -31,8 +31,8 @@ public class GameUI {
         // Add pages to CardLayout
         mainPanel.add(selectionPage(), PAGE_SELECTION);
         mainPanel.add(waitingPage(), PAGE_WAITING);
-        mainPanel.add(resultsPage("", ""), PAGE_RESULTS);
-        mainPanel.add(scorePage("", ""), PAGE_SCORE);
+        mainPanel.add(resultsPage("", "", ""), PAGE_RESULTS);
+        mainPanel.add(scorePage("", "", ""), PAGE_SCORE);
 
         frame.add(mainPanel);
         frame.setSize(800, 600);
@@ -93,21 +93,43 @@ public class GameUI {
         return panel;
     }
 
-    private static JPanel resultsPage(String gameResult, String roundWinner) {
+    private static JPanel resultsPage(String gameResult, String serverPlay, String roundWinner) {
         JPanel panel = new JPanel(new BorderLayout());
         panel.setBackground(new Color(130, 224, 170));
 
+        JPanel labelPanel = new JPanel();
+        labelPanel.setLayout(new BoxLayout(labelPanel, BoxLayout.Y_AXIS));
+        labelPanel.setOpaque(false);
+
+        JLabel serverPlayLabel = new JLabel("Server chose " + serverPlay, SwingConstants.CENTER);
+        serverPlayLabel.setFont(new Font("Arial", Font.PLAIN, 24));
+        serverPlayLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
+        labelPanel.add(Box.createVerticalStrut(20));
+        labelPanel.add(serverPlayLabel);
+
         JLabel winnerLabel = new JLabel(roundWinner + " wins the round!", SwingConstants.CENTER);
         winnerLabel.setFont(new Font("Arial", Font.PLAIN, 24));
-        panel.add(winnerLabel, BorderLayout.NORTH);
+        winnerLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
+        labelPanel.add(Box.createVerticalStrut(10));
+        labelPanel.add(winnerLabel);
+
+        panel.add(labelPanel, BorderLayout.NORTH);
 
         JLabel resultImage = new JLabel(new ImageIcon("resources/" + gameResult + ".png"));
         resultImage.setHorizontalAlignment(SwingConstants.CENTER);
         panel.add(resultImage, BorderLayout.CENTER);
 
+        JPanel bottomPanel = new JPanel();
+        bottomPanel.setLayout(new BoxLayout(bottomPanel, BoxLayout.Y_AXIS));
+        bottomPanel.setOpaque(false);
+
         JLabel bottomTextLabel = new JLabel("(Click to continue)", SwingConstants.CENTER);
-        bottomTextLabel.setFont(new Font("Arial", Font.PLAIN, 24));
-        panel.add(bottomTextLabel, BorderLayout.SOUTH);
+        bottomTextLabel.setFont(new Font("Arial", Font.PLAIN, 16));
+        bottomTextLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
+
+        bottomPanel.add(bottomTextLabel);
+        bottomPanel.add(Box.createVerticalStrut(20));
+        panel.add(bottomPanel, BorderLayout.SOUTH);
 
         panel.addMouseListener(new java.awt.event.MouseAdapter() {
             @Override
@@ -119,7 +141,7 @@ public class GameUI {
         return panel;
     }
 
-    private static JPanel scorePage(String clientScore, String serverScore) {
+    private static JPanel scorePage(String clientScore, String serverScore, String ties) {
         JPanel panel = new JPanel(new GridBagLayout());
         panel.setBackground(new Color(244, 208, 63));
 
@@ -128,7 +150,7 @@ public class GameUI {
         gbc.gridy = 0;
         gbc.insets = new Insets(5, 5, 5, 5);
 
-        JLabel scoreLabel = new JLabel("Current score is " + clientScore + " to " + serverScore);
+        JLabel scoreLabel = new JLabel("Current score is " + clientScore + " to " + serverScore + " with " + ties + " ties");
         scoreLabel.setFont(new Font("Arial", Font.BOLD, 24));
         panel.add(scoreLabel, gbc);
         gbc.gridy++;
@@ -178,14 +200,16 @@ public class GameUI {
             gameClient.getResultFromServer(choice, serverMessage -> {
                 String[] data = serverMessage.split(",");
                 String gameResult = data[0];
-                String roundWinner = data[1];
-                String clientScore = data[2];
-                String serverScore = data[3];
+                String serverChoice = data[1];
+                String roundWinner = data[2];
+                String clientScore = data[3];
+                String serverScore = data[4];
+                String gameTies = data[5];
 
-                JPanel resultsPanel = resultsPage(gameResult, roundWinner);
+                JPanel resultsPanel = resultsPage(gameResult, serverChoice, roundWinner);
                 mainPanel.add(resultsPanel, PAGE_RESULTS);
 
-                JPanel scorePanel = scorePage(clientScore, serverScore);
+                JPanel scorePanel = scorePage(clientScore, serverScore, gameTies);
                 mainPanel.add(scorePanel, PAGE_SCORE);
 
                 cardLayout.show(mainPanel, PAGE_RESULTS);
