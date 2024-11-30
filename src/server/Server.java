@@ -1,116 +1,102 @@
 import java.io.*;
 import java.net.*;
-import java.util.concurrent.TimeUnit;
 
 public class Server {
 
-    //server chooses rock [1], paper [2], scissors [3]
-    public static int choosePlay(){
-        return 1+((int)(Math.random()*((3-1)+1)));
+    public static String choosePlay() {
+        int choice = 1 + ((int) (Math.random() * 3));
+        switch (choice) {
+            case 1:
+                return "rock";
+            case 2:
+                return "paper";
+            case 3:
+                return "scissors";
+            default:
+                throw new IllegalStateException("Unexpected value: " + choice);
+        }
     }
 
-    public static void main(String[] args){
-        //starts server and waits for connection
-        try{
-            ServerSocket server = new ServerSocket(37);
-            //accept client connection
-            Socket socket = server.accept();
-            System.out.println("Connection established");
-            //taking input from client socket
-            DataInputStream in = new DataInputStream(new BufferedInputStream(socket.getInputStream()));
-			// Sends output to the socket
-			DataOutputStream out = new DataOutputStream(socket.getOutputStream());
-            
-
-
-			System.out.println("Client Played: " + in.readUTF());
-			try {
-				TimeUnit.MILLISECONDS.sleep(500);
-			} catch (InterruptedException e) {
-				e.printStackTrace();
-			}
-			// Args: gameResult, roundWinner, clientScore, serverScore
-			out.writeUTF(String.format("%s,%s,%d,%d", "paper-paper", "Client", 4, 2));
-			out.flush();
-
-
-    /*        
-            //initial input value 0 to start game from scratch
-            int clientPlay;
-            int playAgain = 0;
-
-			// Get client selection with in.readUTF();
-            
-            
-            // INPUTS:
-            // [1] -> rock
-            // [2] -> paper
-            // [3] -> scissors
-            
-            while(playAgain!=1) {
-            	try {
-            	//read client play selection
-            	clientPlay = in.read();
-            	System.out.println("Client Played: " + clientPlay);
-
-            	//generate server play
-            	int serverPlay = choosePlay();
-            	System.out.println(serverPlay);
-            	//compute result
-            	
-            	//DRAW
-            	if (clientPlay == serverPlay){
-            		System.out.println("DRAW");
-            	}
-            	//CLIENT PLAYS ROCK
-            	else if (clientPlay==1) {
-            		//SERVER PLAYS PAPER
-            		if (serverPlay==2) {
-            			System.out.println("Server played paper -- LOSS");
-            		}
-            		//SERVER PLAYS SCISSORS
-            		else if (serverPlay==3) {
-            			System.out.println("Server played scissors -- WIN");
-            		}
-            	}
-            	//CLIENT PLAYS PAPER
-            	else if (clientPlay==2) {
-            		//SERVER PLAYS ROCK
-            		if(serverPlay==1) {
-            			System.out.println("Server played rock -- WIN");
-            		}
-            		//SERVER PLAYS SCISSORS
-            		else if(serverPlay==3) {
-            			System.out.println("Server played scissors -- LOSE");
-            		}            		
-            	}
-            	//CLIENT PLAYS SCISSORS
-            	else if (clientPlay==3) {
-            		//SERVER PLAYS ROCK
-            		if (serverPlay==1) {
-            			System.out.println("Server played rock -- LOSE");
-            		}
-            		//SERVER PLAYS PAPER
-            		else if(serverPlay==2) {
-            			System.out.println("Server played paper -- WIN");
-            		}
-            	}
-            	playAgain = in.read();
-            	System.out.println("Play Again Result: " + playAgain);
-            	}
-            	catch (IOException e) {
-            		e.printStackTrace();
-            	}
-            }
-	*/		
-
-            // close server and data streams
-            server.close();
-            in.close();
+    public static String winner(String userChoice, String serverChoice) {
+        if (userChoice.equals(serverChoice)) {
+            return "No one";
         }
-        catch(IOException e){
+        if ((userChoice.equals("rock") && serverChoice.equals("scissors")) ||
+            (userChoice.equals("paper") && serverChoice.equals("rock")) ||
+            (userChoice.equals("scissors") && serverChoice.equals("paper"))) {
+            return "Client";
+        }
+        return "Server";
+    }
+
+    public static void main(String[] args) {
+        int clientScore = 0;
+        int serverScore = 0;
+        int ties = 0;
+
+        boolean keepPlaying = true;
+
+        try (ServerSocket serverSocket = new ServerSocket(37)) {
+            System.out.println("Server is waiting for a connection...");
+            Socket socket = serverSocket.accept();
+            System.out.println("Connection established");
+
+            try (DataInputStream in = new DataInputStream(socket.getInputStream());
+                 DataOutputStream out = new DataOutputStream(socket.getOutputStream())) {
+
+                while (keepPlaying) {
+                    try {
+                        String userChoice = in.readUTF();
+                        System.out.println("Client Played: " + userChoice);
+
+                        if (!isValidChoice(userChoice)) {
+                            System.out.println("Invalid user choice: " + userChoice);
+                            out.writeUTF("Invalid choice. Terminating the game.");
+                            break;
+                        }
+
+                        String serverChoice = choosePlay();
+                        System.out.println("Server Played: " + serverChoice);
+
+                        String roundWinner = winner(userChoice, serverChoice);
+                        System.out.println("Round winner: " + roundWinner);
+
+                        if (roundWinner.equals("Client")) {
+                            clientScore++;
+                        } else if (roundWinner.equals("Server")) {
+                            serverScore++;
+                        } else {
+                            ties++;
+                        }
+
+                        out.writeUTF(String.format("%s,%s,%d,%d,%d", 
+                            userChoice + "-" + serverChoice, roundWinner, clientScore, serverScore, ties));
+                        out.flush();
+
+                        String playAgain = in.readUTF();
+                        if (playAgain.equalsIgnoreCase("no")) {
+                            keepPlaying = false;
+                            System.out.println("Client chose to quit. Ending game...");
+                        } else if (!playAgain.equalsIgnoreCase("yes")) {
+                            System.out.println("Invalid replay signal received: " + playAgain);
+                            break;
+                        }
+                    } catch (IOException e) {
+                        System.out.println("Connection lost or error occurred. Ending game.");
+                        e.printStackTrace();
+                        break;
+                    }
+                }
+            }
+        } catch (IOException e) {
+            System.out.println("Error with the server: " + e.getMessage());
             e.printStackTrace();
         }
+    }
 
+    private static boolean isValidChoice(String choice) {
+        return choice.equalsIgnoreCase("rock") ||
+               choice.equalsIgnoreCase("paper") ||
+               choice.equalsIgnoreCase("scissors");
     }
 }
