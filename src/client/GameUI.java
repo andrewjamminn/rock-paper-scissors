@@ -137,7 +137,7 @@ public class GameUI {
         bottomPanel.setOpaque(false);
 
         // Add continue label below the image
-        JLabel bottomTextLabel = new JLabel("(Click to continue)", SwingConstants.CENTER);
+        JLabel bottomTextLabel = new JLabel("(Click anywhere to continue)", SwingConstants.CENTER);
         bottomTextLabel.setFont(new Font("Arial", Font.PLAIN, 16));
         bottomTextLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
 
