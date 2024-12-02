@@ -64,8 +64,7 @@ public class Server {
                         
                         // Validate clients choice.
                         if (!isValidChoice(userChoice)) {
-                            System.err.println("Invalid user choice: " + userChoice);
-                            out.writeUTF("Invalid choice. Terminating the game.");
+                            System.err.println("Invalid user choice: " + userChoice + ". Terminating the game.");
                             break;
                         }
 
