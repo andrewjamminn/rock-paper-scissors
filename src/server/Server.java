@@ -84,6 +84,7 @@ public class Server {
                         } else {
                             ties++;
                         }
+                        System.out.println("Score: Client = " + clientScore + " | Server = " + serverScore + " | Ties = " + ties);
 
                         // Delay simulation.
                         TimeUnit.MILLISECONDS.sleep(500);
