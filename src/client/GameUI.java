@@ -11,7 +11,7 @@ public class GameUI {
 
     private static JButton rock, paper, scissors;
     private static JPanel mainPanel, iconPanel;
-    private static JFrame frame;
+    static JFrame frame;
 
     private static CardLayout cardLayout;
     private static Client gameClient;
@@ -167,17 +167,25 @@ public class GameUI {
         gbc.gridy = 0;
         gbc.insets = new Insets(5, 5, 5, 5);
 
-        // Add label for score
-        JLabel scoreLabel = new JLabel("Current score is " + clientScore + " to " + serverScore + " with " + ties + " ties");
-        scoreLabel.setFont(new Font("Arial", Font.BOLD, 24));
+        // Add label for current score text
+        JLabel scoreTextLabel = new JLabel("Current score");
+        scoreTextLabel.setFont(new Font("Arial", Font.BOLD, 24));
+        panel.add(scoreTextLabel, gbc);
+        gbc.gridy++;
+
+        // Add label for scores
+        JLabel scoreLabel = new JLabel("Wins: " + clientScore + " | Loses: " + serverScore + " | Ties: " + ties);
+        scoreLabel.setFont(new Font("Arial", Font.PLAIN, 24));
         panel.add(scoreLabel, gbc);
         gbc.gridy++;
+        gbc.insets = new Insets(20, 5, 5, 5);
 
         // Add label for playing again
         JLabel playAgainTextLabel = new JLabel("Would you like to play again?");
         playAgainTextLabel.setFont(new Font("Arial", Font.PLAIN, 18));
         panel.add(playAgainTextLabel, gbc);
         gbc.gridy++;
+        gbc.insets = new Insets(5, 5, 5, 5);
 
         // Create a new panel for the buttons with FlowLayout
         JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 20, 0));

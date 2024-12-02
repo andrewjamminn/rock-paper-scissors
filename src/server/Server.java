@@ -64,7 +64,7 @@ public class Server {
                         
                         // Validate clients choice.
                         if (!isValidChoice(userChoice)) {
-                            System.out.println("Invalid user choice: " + userChoice);
+                            System.err.println("Invalid user choice: " + userChoice);
                             out.writeUTF("Invalid choice. Terminating the game.");
                             break;
                         }
@@ -94,13 +94,13 @@ public class Server {
                             userChoice + "-" + serverChoice, serverChoice, roundWinner, clientScore, serverScore, ties));
                         out.flush(); // Make sure data is sent.
                     } catch (IOException | InterruptedException e) {
-                        System.out.println("Connection lost or error occurred. Ending game.");
+                        System.err.println("Connection lost or error occurred. Ending game.");
                         keepPlaying = false; // End game.
                     }
                 }
             }
         } catch (IOException e) {
-            System.out.println("Error with the server: " + e.getMessage()); // Handle server socket errors.
+            System.err.println("Error with the server: " + e.getMessage()); // Handle server socket errors.
             e.printStackTrace();
         }
     }

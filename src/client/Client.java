@@ -1,5 +1,7 @@
 import java.io.*;
 import java.net.*;
+
+import javax.swing.JOptionPane;
 import javax.swing.SwingUtilities;
 
 public class Client {
@@ -37,14 +39,21 @@ public class Client {
 				// Send the user's choice to the server
 				out.writeUTF(userChoice);
 				out.flush();
+
+				// Set a timeout for server response
+				socket.setSoTimeout(5000);
 	
 				// Wait for the server's response
 				String serverResponse = in.readUTF();
 	
 				// Notify the UI on the Swing thread
 				SwingUtilities.invokeLater(() -> callback.onResultReceived(serverResponse));
+			} catch (SocketTimeoutException e) {
+				System.err.println("Server did not respond in time. Closing client.");
+				exit();
 			} catch (IOException e) {
-				e.printStackTrace();
+				System.err.println("Connection to server lost. Closing client.");
+				exit();
 			}
 		}).start();
 	}
@@ -52,6 +61,16 @@ public class Client {
 	// Define a callback interface for passing the result to the UI
 	public interface ResultCallback {
 		void onResultReceived(String result);
+	}
+
+	// Cleanup and exit game
+	private void exit() {
+		try {
+			close();
+			GameUI.frame.dispose();
+		} catch (IOException e1) {
+			e1.printStackTrace();
+		}
 	}
 	
     // Close the connection
