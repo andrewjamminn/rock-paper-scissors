@@ -31,17 +31,12 @@ public class Client {
 		out = new DataOutputStream(socket.getOutputStream());
     }
 
-    // Send the player's choice to the server
-    public void sendChoice(String choice) throws IOException {
-        out.writeUTF(choice);
-		out.flush();
-    }
-
 	public void getResultFromServer(String userChoice, ResultCallback callback) {
 		new Thread(() -> {
 			try {
 				// Send the user's choice to the server
-				sendChoice(userChoice);
+				out.writeUTF(userChoice);
+				out.flush();
 	
 				// Wait for the server's response
 				String serverResponse = in.readUTF();
