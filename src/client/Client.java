@@ -1,7 +1,6 @@
 import java.io.*;
 import java.net.*;
 
-import javax.swing.JOptionPane;
 import javax.swing.SwingUtilities;
 
 public class Client {
